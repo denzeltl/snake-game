@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import useInterval from './useInterval';
+import { useInterval } from './useInterval';
 import { CANVAS_SIZE, SNAKE_START, APPLE_START, SCALE, SPEED, DIRECTIONS } from './constants';
 
 const App = () => {
@@ -14,7 +14,17 @@ const App = () => {
 
     const endGame = () => {};
 
-    const moveSnake = () => {};
+    const moveSnake = ({ keyCode }) => {
+        keyCode >= 37 && keyCode <= 40 && setDir(DIRECTIONS[keyCode]);
+    };
+
+    const gameLoop = () => {
+        const snakeCopy = JSON.parse(JSON.stringify(snake));
+        const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
+        snakeCopy.unshift(newSnakeHead);
+        snakeCopy.pop();
+        setSnake(snakeCopy);
+    };
 
     useEffect(() => {
         const context = canvasRef.current.getContext('2d');
@@ -25,6 +35,8 @@ const App = () => {
         context.fillStyle = 'red';
         context.fillRect(apple[0], apple[1], 1, 1);
     }, [snake, apple, gameover]);
+
+    useInterval(() => gameLoop(), speed);
 
     return (
         <div role="button" tabIndex="0" onKeyDown={(e) => moveSnake(e)}>
